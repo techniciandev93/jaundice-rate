@@ -10,6 +10,9 @@ def sanitize(html, plaintext=False):
     soup = BeautifulSoup(html, 'html.parser')
     article = soup.select_one("div.layout-article")
 
+    if not article:
+        raise ArticleNotFound()
+
     article.attrs = {}
 
     buzz_blocks = [
