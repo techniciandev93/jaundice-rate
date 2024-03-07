@@ -4,7 +4,7 @@ import string
 
 def _clean_word(word):
     word = word.replace('«', '').replace('»', '').replace('…', '')
-    # FIXME какие еще знаки пунктуации часто встречаются ?
+
     word = word.strip(string.punctuation)
     return word
 
@@ -21,8 +21,7 @@ def split_by_words(morph, text):
 
 
 def test_split_by_words():
-    # Экземпляры MorphAnalyzer занимают 10-15Мб RAM т.к. загружают в память много данных
-    # Старайтесь организовать свой код так, чтоб создавать экземпляр MorphAnalyzer заранее и в единственном числе
+
     morph = pymorphy2.MorphAnalyzer()
 
     assert split_by_words(morph, 'Во-первых, он хочет, чтобы') == ['во-первых', 'хотеть', 'чтобы']
