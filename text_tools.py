@@ -1,32 +1,35 @@
 import pymorphy2
 import string
 
+import pytest
+from async_timeout import timeout
 
-def _clean_word(word):
+
+async def _clean_word(word):
     word = word.replace('«', '').replace('»', '').replace('…', '')
-
     word = word.strip(string.punctuation)
     return word
 
 
-def split_by_words(morph, text):
+async def split_by_words(morph, text, wait_timeout=3):
     """Учитывает знаки пунктуации, регистр и словоформы, выкидывает предлоги."""
-    words = []
-    for word in text.split():
-        cleaned_word = _clean_word(word)
-        normalized_word = morph.parse(cleaned_word)[0].normal_form
-        if len(normalized_word) > 2 or normalized_word == 'не':
-            words.append(normalized_word)
-    return words
+    async with timeout(wait_timeout):
+        words = []
+        for word in text.split():
+            cleaned_word = await _clean_word(word)
+            normalized_word = morph.parse(cleaned_word)[0].normal_form
+            if len(normalized_word) > 2 or normalized_word == 'не':
+                words.append(normalized_word)
+        return words
 
 
-def test_split_by_words():
-
+@pytest.mark.asyncio
+async def test_split_by_words():
     morph = pymorphy2.MorphAnalyzer()
 
-    assert split_by_words(morph, 'Во-первых, он хочет, чтобы') == ['во-первых', 'хотеть', 'чтобы']
+    assert await split_by_words(morph, 'Во-первых, он хочет, чтобы') == ['во-первых', 'хотеть', 'чтобы']
 
-    assert split_by_words(morph, '«Удивительно, но это стало началом!»') == ['удивительно', 'это', 'стать', 'начало']
+    assert await split_by_words(morph, '«Удивительно, но это стало началом!»') == ['удивительно', 'это', 'стать', 'начало']
 
 
 def calculate_jaundice_rate(article_words, charged_words):

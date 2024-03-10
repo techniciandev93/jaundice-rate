@@ -39,7 +39,7 @@ async def process_article(session, morph, charged_words, url, result_articles, w
                     response.raise_for_status()
                     html = await response.text()
                     sanitize_result = sanitize(html, plaintext=True)
-                    words = split_by_words(morph, sanitize_result)
+                    words = await split_by_words(morph, sanitize_result)
                     score = calculate_jaundice_rate(words, charged_words)
 
                 result_articles.append((url, ProcessingStatus.OK.value, score, len(words), analysis_time()))
@@ -61,11 +61,10 @@ async def main(urls, charged_words):
             for url in urls:
                 tg.start_soon(process_article, session, morph, charged_words, url, result_articles)
 
-    print(result_articles)
     for url, status, rating, word_count, analysis_time in result_articles:
-        print()
-        print(f'URL: {url}\nСтатус: {status}\nРейтинг: {rating}\nСлов в статье {word_count}')
+        logging.info(f'URL: {url}\nСтатус: {status}\nРейтинг: {rating}\nСлов в статье {word_count}')
         logging.info(f'Анализ закончен за {analysis_time:.2f} сек')
+    return result_articles
 
 
 def read_file(file_path):
