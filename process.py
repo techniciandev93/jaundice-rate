@@ -49,11 +49,9 @@ async def process_article(session, morph, charged_words, url, result_articles, w
         result_articles.append((url, ProcessingStatus.PARSING_ERROR.value, None, None, 0))
     except asyncio.TimeoutError:
         result_articles.append((url, ProcessingStatus.TIMEOUT.value, None, None, 0))
-    except Exception as error:
-        logging.error(f'Ошибка при обработке статьи {url}: {error}')
 
 
-async def main(urls, charged_words):
+async def process_article_main(urls, charged_words):
     result_articles = []
     morph = pymorphy2.MorphAnalyzer()
     async with aiohttp.ClientSession() as session:
@@ -72,12 +70,20 @@ def read_file(file_path):
         return file.read().split('\n')
 
 
+def get_charged_words(negative_words_path, positive_words_path):
+    charged_words = []
+    negative_words = read_file(negative_words_path)
+    positive_words = read_file(positive_words_path)
+    charged_words.extend(negative_words)
+    charged_words.extend(positive_words)
+    return charged_words
+
+
 if __name__ == '__main__':
     negative_words_path = 'charged_dict/negative_words.txt'
     positive_words_path = 'charged_dict/positive_words.txt'
 
-    negative_words = read_file(negative_words_path)
-    positive_words = read_file(positive_words_path)
+    words = get_charged_words(negative_words_path, positive_words_path)
 
     test_articles = ['https://inosmi.ru/20240214/241584580.html',
                      'https://inosmi.ru/economic/20190629/245384784.html',
@@ -93,4 +99,4 @@ if __name__ == '__main__':
     )
     logger.setLevel(logging.INFO)
 
-    anyio.run(main, test_articles, negative_words)
+    anyio.run(process_article_main, test_articles, words)

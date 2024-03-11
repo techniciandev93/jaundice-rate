@@ -8,7 +8,7 @@
 
 # Как установить
 
-Вам понадобится Python версии 3.7 или старше. Для установки пакетов рекомендуется создать виртуальное окружение.
+Вам понадобится Python версии 3.10 или старше. Для установки пакетов рекомендуется создать виртуальное окружение.
 
 Первым шагом установите пакеты:
 
@@ -19,7 +19,25 @@ pip install -r requirements.txt
 # Как запустить
 
 ```python3
-python main.py
+python server.py
+```
+
+# Как использовать
+В параметрах запроса необходимо передать список url со статьями. Кол-во url в одном запросе не больше 10. Пример запроса:
+
+```
+http://127.0.0.1:8080/?urls=https://inosmi.ru/social/20190718/245490620.html,https://inosmi.ru/social/20190718/245490620.html,https://inosmi.ru/politic/20190718/245488830.html,https://inosmi.ru/social/20190718/245490620.html,https://inosmi.ru/politic/20190718/245487867.html,https://inosmi.ru/military/20190718/245490081.html
+```
+
+Пример ответа:
+
+```
+{
+  "status": "OK",
+  "url": "https://inosmi.ru/social/20190718/245490620.html",
+  "score": 0.19,
+  "words_count": 533
+}
 ```
 
 # Как запустить тесты
@@ -32,6 +50,10 @@ python -m pytest adapters/inosmi_ru.py
 
 ```
 python -m pytest text_tools.py
+```
+
+```
+python -m pytest server.py
 ```
 
 # Цели проекта
