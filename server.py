@@ -3,7 +3,7 @@ from functools import partial
 import pytest
 from aiohttp import web
 
-from process import read_file, process_article_main, ProcessingStatus, get_charged_words
+from process import process_article_main, ProcessingStatus, get_charged_words
 
 
 async def handle(charged_words, request, max_urls=10):
@@ -61,9 +61,8 @@ if __name__ == '__main__':
     negative_words_path = 'charged_dict/negative_words.txt'
     positive_words_path = 'charged_dict/positive_words.txt'
 
-    negative_words = read_file(negative_words_path)
-    positive_words = read_file(positive_words_path)
+    charged_words = get_charged_words(negative_words_path, positive_words_path)
 
     app = web.Application()
-    app.add_routes([web.get('/', partial(handle, negative_words))])
+    app.add_routes([web.get('/', partial(handle, charged_words))])
     web.run_app(app)
