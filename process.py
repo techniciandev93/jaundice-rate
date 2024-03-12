@@ -51,9 +51,8 @@ async def process_article(session, morph, charged_words, url, result_articles, w
         result_articles.append((url, ProcessingStatus.TIMEOUT.value, None, None, 0))
 
 
-async def process_article_main(urls, charged_words):
+async def process_article_main(urls, charged_words, morph):
     result_articles = []
-    morph = pymorphy2.MorphAnalyzer()
     async with aiohttp.ClientSession() as session:
         async with anyio.create_task_group() as tg:
             for url in urls:
@@ -80,6 +79,7 @@ def get_charged_words(negative_words_path, positive_words_path):
 
 
 if __name__ == '__main__':
+    morph = pymorphy2.MorphAnalyzer()
     negative_words_path = 'charged_dict/negative_words.txt'
     positive_words_path = 'charged_dict/positive_words.txt'
 
@@ -99,4 +99,4 @@ if __name__ == '__main__':
     )
     logger.setLevel(logging.INFO)
 
-    anyio.run(process_article_main, test_articles, words)
+    anyio.run(process_article_main, test_articles, words, morph)
