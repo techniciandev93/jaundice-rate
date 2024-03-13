@@ -1,3 +1,4 @@
+import anyio
 import pymorphy2
 import string
 
@@ -5,7 +6,7 @@ import pytest
 from async_timeout import timeout
 
 
-async def _clean_word(word):
+def _clean_word(word):
     word = word.replace('«', '').replace('»', '').replace('…', '')
     word = word.strip(string.punctuation)
     return word
@@ -16,10 +17,11 @@ async def split_by_words(morph, text, wait_timeout=3):
     async with timeout(wait_timeout):
         words = []
         for word in text.split():
-            cleaned_word = await _clean_word(word)
+            cleaned_word = _clean_word(word)
             normalized_word = morph.parse(cleaned_word)[0].normal_form
             if len(normalized_word) > 2 or normalized_word == 'не':
                 words.append(normalized_word)
+            await anyio.sleep(0)
         return words
 
 
